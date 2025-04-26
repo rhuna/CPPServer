@@ -20,17 +20,20 @@ public:
 	void receiveMessage();
 	void handleServerResponse(const std::string& response);
 	void status();
-
-private:
-
-
-	sf::TcpSocket socket;
-	sf::IpAddress serverIpAddress;
-	unsigned short serverPort;
-	// Add any other necessary member variables or methods here
 	void initialize();
 	void cleanup();
 	void processMessage(const std::string& message);
+
+
+private:
+
+	sf::Packet m_packet;
+	std::vector<sf::Packet> m_packets;
+	sf::TcpSocket m_socket;
+	sf::IpAddress m_serverIpAddress;
+	unsigned short m_serverPort;
+	// Add any other necessary member variables or methods here
+
 
 };
 

@@ -4,14 +4,14 @@
 
 
 Client::Client() 
-	: isConnected(false), serverPort(53000), serverIpAddress(sf::IpAddress::LocalHost), 
-	socket()
+	: isConnected(false), m_serverPort(53000), m_serverIpAddress(sf::IpAddress::LocalHost),
+	m_socket()
 {// Initialize the socket
 
 	std::cout << "client constructor called" << std::endl;
 }
 Client::Client(sf::IpAddress servIPadd) 
-	: isConnected(false), serverPort(53000), serverIpAddress(servIPadd)
+	: isConnected(false), m_serverPort(53000), m_serverIpAddress(servIPadd)
 {
 	std::cout << "client constructor with IP called" << std::endl;
 }
@@ -20,7 +20,7 @@ Client::~Client() {
 	if (isConnected) {
 		disconnect();
 	}
-	socket.disconnect();
+	m_socket.disconnect();
 	std::cout << "Client disconnected." << std::endl;
 };
 void Client::connect(const sf::IpAddress& ipAddress, unsigned short port) {
@@ -30,13 +30,13 @@ void Client::connect(const sf::IpAddress& ipAddress, unsigned short port) {
 		return;
 	}
 
-	serverIpAddress = ipAddress;
-	serverPort = port;
+	m_serverIpAddress = ipAddress;
+	m_serverPort = port;
 
-	sf::Socket::Status status = socket.connect(serverIpAddress, serverPort, sf::seconds(5));
+	sf::Socket::Status status = m_socket.connect(m_serverIpAddress, m_serverPort, sf::seconds(5));
 	if (status == sf::Socket::Status::Done) {
 		isConnected = true;
-		std::cout << "Connected to server at " << serverIpAddress << ":" << serverPort << std::endl;
+		std::cout << "Connected to server at " << m_serverIpAddress << ":" << m_serverPort << std::endl;
 	}
 	else {
 		std::cerr << "client Failed to connect to server: ";
@@ -53,7 +53,7 @@ void Client::connect(const sf::IpAddress& ipAddress, unsigned short port) {
 void Client::disconnect() {
 	// Disconnect from the server
 	if (isConnected) {
-		socket.disconnect();
+		m_socket.disconnect();
 		isConnected = false;
 		std::cout << "client Disconnected from server." << std::endl;
 	}
@@ -64,26 +64,26 @@ void Client::disconnect() {
 void Client::sendMessage(const std::string& message) {
 	// Send a message to the server
 	if (isConnected) {
-		sf::Packet packet;
-		packet << message;
-		if (socket.send(packet) != sf::Socket::Status::Done) {
-			std::cerr << "Failed to send message." << std::endl;
+		m_packet << message;
+		if (m_socket.send(m_packet) != sf::Socket::Status::Done) {
+			std::cerr << "Client Failed to send message." << std::endl;
 		}
 		else {
-			std::cout << "Message sent: " << message << std::endl;
+			std::cout << "Message sent from client: " << message << std::endl;
 		}
 	}
 	else {
 		std::cerr << "Client is not connected." << std::endl;
 	}
+	m_packet.clear(); // Clear the packet after sending
 };
 void Client::receiveMessage() {
 	// Receive a message from the server
 	if (isConnected) {
-		sf::Packet packet;
-		if (socket.receive(packet) == sf::Socket::Status::Done) {
+		if (m_socket.receive(m_packet) == sf::Socket::Status::Done) {
 			std::string message;
-			packet >> message;
+			m_packet >> message;
+			
 			std::cout << "client Message received: " << message << std::endl;
 			handleServerResponse(message);
 		}
@@ -94,10 +94,11 @@ void Client::receiveMessage() {
 	else {
 		std::cerr << "Client is not connected." << std::endl;
 	}
+	m_packet.clear(); // Clear the packet after processing
 };
 void Client::handleServerResponse(const std::string& response) {
 	// Handle the server's response
-	std::cout << "Server response: " << response << std::endl;
+	std::cout << "handling Server response: " << response << std::endl;
 	// Process the response as needed
 	// For example, you can call processMessage(response);
 	// processMessage(response);
@@ -110,14 +111,14 @@ void Client::initialize() {
 	// Initialization code here
 	std::cout << "Client initialized." << std::endl;
 	// You can set up the socket and other resources here
-	socket.setBlocking(false); // Set the socket to non-blocking mode
+	m_socket.setBlocking(false); // Set the socket to non-blocking mode
 	// Add any other necessary initialization steps
 }; 
 void Client::cleanup() {
 	// Cleanup code here
 	std::cout << "Client cleanup completed." << std::endl;
 	// Close the socket and free resources
-	socket.disconnect();
+	m_socket.disconnect();
 	isConnected = false;
 };
 void Client::processMessage(const std::string& message) {

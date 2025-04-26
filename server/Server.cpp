@@ -132,7 +132,7 @@ void Server::sendMessage(const std::string& message) {
 			it = m_clientSockets.erase(it);
 		}
 		else {
-			std::cout << "Message sent to client: " << message << std::endl;
+			std::cout << "Message sent from server: " << message << std::endl;
 			++it;
 		}
 	}
@@ -144,7 +144,7 @@ void Server::receiveMessage() {
 		if (m_clientSocket.receive(m_packet) == sf::Socket::Status::Done) {
 			std::string message;
 			m_packet >> message;
-			std::cout << "Message received fron Server: " << message << std::endl;
+			std::cout << "Message received from Server: " << message << std::endl;
 			processMessage(message);
 		}
 		else {
