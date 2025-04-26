@@ -41,7 +41,7 @@ private:
 	std::vector<sf::Packet> m_packets;
 	std::vector<sf::TcpSocket*> m_clientSockets;
 	sf::Packet m_packet;
-	sf::TcpSocket* m_clientSocket;
+	sf::TcpSocket m_clientSocket;
 	sf::TcpListener m_listener;
 	unsigned short m_port;
 	std::string m_ipAddress;

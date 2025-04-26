@@ -59,9 +59,8 @@ void Server::start() {
 void Server::acceptConnections() {
 	while (m_isRunning) {
 		sf::TcpSocket* clientSocket = new sf::TcpSocket;
-		m_clientSocket = clientSocket;
-		if (m_listener.accept(*m_clientSocket) == sf::Socket::Status::Done) {
-			std::cout << "New client connected: " << *m_clientSocket->getRemoteAddress() << std::endl;
+		if (m_listener.accept(*clientSocket) == sf::Socket::Status::Done) {
+			std::cout << "New client connected: " << *clientSocket->getRemoteAddress() << std::endl;
 			// Store the client socket
 			m_clientSockets.push_back(clientSocket);
 			// Start a thread to handle this client
