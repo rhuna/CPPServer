@@ -32,7 +32,6 @@ void Server::start() {
 	// Start the server
 	if (!m_isRunning) {
 		if (m_listener.listen(m_port) != sf::Socket::Status::Done) {
-			//std::lock_guard<std::mutex> lock(m_clientMutex);
 			std::cerr << "Failed to start server on port " << m_port << std::endl;
 		}
 		else {
@@ -40,17 +39,17 @@ void Server::start() {
 			m_isRunning = true;
 
 			// Start a thread to accept clients
+			//std::lock_guard<std::mutex> lock(m_clientMutex);
 			acceptThread = std::thread(&Server::acceptConnections, this);
 		}
 	};
 };
 
-
 void Server::acceptConnections() {
 	while (m_isRunning) {
 		sf::TcpSocket* clientSocket = new sf::TcpSocket;
 		if (m_listener.accept(*clientSocket) == sf::Socket::Status::Done) {
-			std::lock_guard<std::mutex> lock(m_clientMutex); // Lock the mutex to protect shared resources
+			//std::lock_guard<std::mutex> lock(m_clientMutex); // Lock the mutex to protect shared resources
 			std::cout << "New client connected to Server IP: " << *clientSocket->getRemoteAddress() << std::endl;
 			// Store the client socket
 			m_clientSockets.push_back(clientSocket);
@@ -58,12 +57,15 @@ void Server::acceptConnections() {
 			std::thread(&Server::handleClient, this, clientSocket).detach();
 		}
 		std::cout << "accepting connections...\n";
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		
 	}
 }
 
 void Server::handleClient(sf::TcpSocket* clientSocket) {
 	// Handle client communication
 	while (m_isRunning) {
+		std::cout << "handling client..." << std::endl;
 		sf::Packet packet;
 		if (clientSocket->receive(packet) == sf::Socket::Status::Done) {
 			std::string message;
@@ -75,7 +77,6 @@ void Server::handleClient(sf::TcpSocket* clientSocket) {
 			std::cerr << "Server Failed to receive message from client." << std::endl;
 			break;
 		}
-		std::cout << "handling client..." << std::endl;
 	}
 	clientSocket->disconnect();
 	delete clientSocket;
@@ -120,10 +121,10 @@ void Server::sendMessage(const std::string& message) {
 	if (m_isRunning) {
 		m_packet << message;
 		if (m_clientSocket.send(m_packet) != sf::Socket::Status::Done) {
-			std::cerr << "Failed to send message." << std::endl;
+			std::cerr << "Server Failed to send message." << std::endl;
 		}
 		else {
-			std::cout << "Message sent: " << message << std::endl;
+			std::cout << "Server Message sent: " << message << std::endl;
 		}
 	}
 	else {
@@ -136,11 +137,11 @@ void Server::receiveMessage() {
 		if (m_clientSocket.receive(m_packet) == sf::Socket::Status::Done) {
 			std::string message;
 			m_packet >> message;
-			std::cout << "Message received: " << message << std::endl;
+			std::cout << "Message received fron Server: " << message << std::endl;
 			processMessage(message);
 		}
 		else {
-			std::cerr << "Failed to receive message." << std::endl;
+			std::cerr << "Server Failed to receive message." << std::endl;
 		}
 	}
 	else {
@@ -152,11 +153,11 @@ void Server::handleClientConnection() {
 	// Handle client connection
 	if (m_isRunning) {
 		if (m_clientSocket.isBlocking() == true) {
-			std::cout << "Client connected." << std::endl;
+			std::cout << "Client connected to server." << std::endl;
 			// You can store the socket for further communication
 		}
 		else {
-			std::cerr << "Failed to accept client connection." << std::endl;
+			std::cerr << "Server Failed to accept client connection." << std::endl;
 		}
 	}
 	else {
