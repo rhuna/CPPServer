@@ -1,26 +1,35 @@
 #include "./server/Server.h"
 #include "./client/Client.h"
+#include <iostream>
+#include <thread>
+
 
 int main(int __argc, char* __argv[])
 {
-	//initialize the server
-	Server server;
-	server.start();
-	//server.sendMessage("Hello, Client!");
-	//server.receiveMessage();
-	//server.handleClientConnection();
-	//server.handleClientDisconnection();
-	//server.handleClientMessage("Hello, Server!");
-	//server.status();
-	//server.restart();
-	//server.stop();
-	//server.cleanup();
+    // Initialize server
+    Server server;
+    server.start();
 
-	Client client;
+    // Give server a moment to start
+    std::this_thread::sleep_for(std::chrono::seconds(1));
 
-	client.connect(server.getIPAddress(), server.getPort());
+    // Initialize client
+    Client client;
 
+    // Connect to server
+    client.connect(server.getIPAddress(), server.getPort());
 
-	std::cout << "Hello World!" << std::endl;
-	return 0;
+    if (client.isConnected) {
+        // Send a test message
+        client.sendMessage("Hello from client!");
+
+        // Receive messages (would need proper threading in real application)
+        client.receiveMessage();
+    }
+
+    // Cleanup
+    client.disconnect();
+    server.stop();
+
+    return 0;
 }

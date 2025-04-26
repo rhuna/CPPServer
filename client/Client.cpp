@@ -7,13 +7,7 @@ Client::Client()
 	: isConnected(false), serverPort(53000), serverIpAddress(sf::IpAddress::LocalHost), 
 	socket()
 {// Initialize the socket
-	if (socket.connect(serverIpAddress, serverPort) == sf::Socket::Status::Done) {
-		isConnected = true;
-		std::cout << "Client connected to server at " << serverIpAddress << ":" << serverPort << std::endl;
-	}
-	else {
-		std::cerr << "client Failed to connect to server at " << serverIpAddress << " : " << serverPort << std::endl;
-	}
+
 
 }
 Client::Client(sf::IpAddress servIPadd) 
@@ -38,14 +32,29 @@ Client::~Client() {
 };
 void Client::connect(const sf::IpAddress& ipAddress, unsigned short port) {
 	// Connect to the server
+	if (isConnected) {
+		std::cerr << "Already connected to server." << std::endl;
+		return;
+	}
+
 	serverIpAddress = ipAddress;
 	serverPort = port;
-	if (socket.connect(serverIpAddress, serverPort) == sf::Socket::Status::Done) {
+
+	sf::Socket::Status status = socket.connect(serverIpAddress, serverPort, sf::seconds(5));
+	if (status == sf::Socket::Status::Done) {
 		isConnected = true;
-		std::cout << "client connected to server at " << serverIpAddress << ":" << serverPort << std::endl;
+		std::cout << "Connected to server at " << serverIpAddress << ":" << serverPort << std::endl;
 	}
 	else {
-		std::cerr << "client Failed to connect to server at " <<serverIpAddress<< " : " << serverPort << std::endl;
+		std::cerr << "Failed to connect to server: ";
+		switch (status) {
+		case sf::Socket::Status::NotReady: std::cerr << "Not ready"; break;
+		case sf::Socket::Status::Partial: std::cerr << "Partial"; break;
+		case sf::Socket::Status::Disconnected: std::cerr << "Disconnected"; break;
+		case sf::Socket::Status::Error: std::cerr << "Error"; break;
+		default: std::cerr << "Unknown error"; break;
+		}
+		std::cerr << std::endl;
 	}
 };
 void Client::disconnect() {

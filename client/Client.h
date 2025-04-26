@@ -5,6 +5,12 @@
 
 class Client{
 public:	
+	
+	
+	bool isConnected;
+
+
+
 	Client();
 	Client(sf::IpAddress servIPadd);
 	~Client();
@@ -16,8 +22,9 @@ public:
 	void status();
 
 private:
+
+
 	sf::TcpSocket socket;
-	bool isConnected;
 	sf::IpAddress serverIpAddress;
 	unsigned short serverPort;
 	// Add any other necessary member variables or methods here
