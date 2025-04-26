@@ -8,19 +8,12 @@ Client::Client()
 	socket()
 {// Initialize the socket
 
-
+	std::cout << "client constructor called" << std::endl;
 }
 Client::Client(sf::IpAddress servIPadd) 
 	: isConnected(false), serverPort(53000), serverIpAddress(servIPadd)
 {
-	// Initialize the socket
-	if (socket.connect(serverIpAddress, serverPort) == sf::Socket::Status::Done) {
-		isConnected = true;
-		std::cout << "Client connected to server at " << serverIpAddress << ":" << serverPort << std::endl;
-	}
-	else {
-		std::cerr << "client Failed to connect to server at " << serverIpAddress << " : " << serverPort << std::endl;
-	}
+	std::cout << "client constructor with IP called" << std::endl;
 }
 Client::~Client() {
 	// Cleanup code here

@@ -21,7 +21,7 @@ int main(int __argc, char* __argv[])
 
     if (client.isConnected) {
         // Send a test message
-        client.sendMessage("Hello from client!");
+        client.sendMessage("whats up?\n");
 
         // Receive messages (would need proper threading in real application)
         client.receiveMessage();

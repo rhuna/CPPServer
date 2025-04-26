@@ -5,6 +5,7 @@
 #include <SFML/Network.hpp>
 #include <SFML/System.hpp>
 #include <thread>
+#include <mutex>
 
 
 class Server{
@@ -12,7 +13,7 @@ class Server{
 public:
 
 	std::thread acceptThread; 
-
+	std::mutex m_clientMutex;
 	Server();
 	~Server();	
 	void start();
@@ -33,7 +34,7 @@ public:
 	void processMessage(const std::string& message);
 	void acceptConnections();
 	void handleClient(sf::TcpSocket* clientSocket);
-
+	
 
 private:
 

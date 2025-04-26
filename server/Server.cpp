@@ -32,18 +32,7 @@ void Server::start() {
 	// Start the server
 	if (!m_isRunning) {
 		if (m_listener.listen(m_port) != sf::Socket::Status::Done) {
-			std::cerr << "Failed to start server on port " << m_port << std::endl;
-		}
-		else {
-			std::cout << "Server started on port " << m_port << std::endl;
-			m_isRunning = true;
-		}
-	}
-	else {
-		std::cout << "Server is already running." << std::endl;
-	}
-	if (!m_isRunning) {
-		if (m_listener.listen(m_port) != sf::Socket::Status::Done) {
+			//std::lock_guard<std::mutex> lock(m_clientMutex);
 			std::cerr << "Failed to start server on port " << m_port << std::endl;
 		}
 		else {
@@ -56,16 +45,19 @@ void Server::start() {
 	};
 };
 
+
 void Server::acceptConnections() {
 	while (m_isRunning) {
 		sf::TcpSocket* clientSocket = new sf::TcpSocket;
 		if (m_listener.accept(*clientSocket) == sf::Socket::Status::Done) {
-			std::cout << "New client connected: " << *clientSocket->getRemoteAddress() << std::endl;
+			std::lock_guard<std::mutex> lock(m_clientMutex); // Lock the mutex to protect shared resources
+			std::cout << "New client connected to Server IP: " << *clientSocket->getRemoteAddress() << std::endl;
 			// Store the client socket
 			m_clientSockets.push_back(clientSocket);
 			// Start a thread to handle this client
 			std::thread(&Server::handleClient, this, clientSocket).detach();
 		}
+		std::cout << "accepting connections...\n";
 	}
 }
 
@@ -76,14 +68,14 @@ void Server::handleClient(sf::TcpSocket* clientSocket) {
 		if (clientSocket->receive(packet) == sf::Socket::Status::Done) {
 			std::string message;
 			packet >> message;
-			std::cout << "Message received from client: " << message << std::endl;
+			std::cout << "Server received message from client: " << message << std::endl;
 			processMessage(message);
 		}
 		else {
-			std::cerr << "Failed to receive message from client." << std::endl;
+			std::cerr << "Server Failed to receive message from client." << std::endl;
 			break;
 		}
-
+		std::cout << "handling client..." << std::endl;
 	}
 	clientSocket->disconnect();
 	delete clientSocket;
@@ -92,9 +84,12 @@ void Server::stop() {
 	// Stop the server
 	if (m_isRunning) {
 		// Close all client connections and cleanup
-		cleanup();
 		m_isRunning = false;
+		if (acceptThread.joinable()) {
+			acceptThread.join();  // Wait for thread to finish
+		}
 		std::cout << "Server stopped." << std::endl;
+		cleanup();
 	}
 	else {
 		std::cout << "Server is not running." << std::endl;
@@ -201,6 +196,16 @@ void Server::cleanup() {
 	std::cout << "Server cleanup completed." << std::endl;
 	// Close all client connections and free resources
 	// You can also reset any member variables if needed
+	// Cleanup client connections
+	for (auto socket : m_clientSockets) {
+		socket->disconnect();
+		delete socket;
+	}
+	m_clientSockets.clear();
+
+	// Close listener
+	m_listener.close();
+
 };
 void Server::acceptClient() {
 	// Accept a client connection
