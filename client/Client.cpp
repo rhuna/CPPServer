@@ -39,7 +39,7 @@ void Client::connect(const sf::IpAddress& ipAddress, unsigned short port) {
 		std::cout << "Connected to server at " << serverIpAddress << ":" << serverPort << std::endl;
 	}
 	else {
-		std::cerr << "Failed to connect to server: ";
+		std::cerr << "client Failed to connect to server: ";
 		switch (status) {
 		case sf::Socket::Status::NotReady: std::cerr << "Not ready"; break;
 		case sf::Socket::Status::Partial: std::cerr << "Partial"; break;
@@ -55,7 +55,7 @@ void Client::disconnect() {
 	if (isConnected) {
 		socket.disconnect();
 		isConnected = false;
-		std::cout << "Disconnected from server." << std::endl;
+		std::cout << "client Disconnected from server." << std::endl;
 	}
 	else {
 		std::cerr << "Client is not connected." << std::endl;
@@ -84,11 +84,11 @@ void Client::receiveMessage() {
 		if (socket.receive(packet) == sf::Socket::Status::Done) {
 			std::string message;
 			packet >> message;
-			std::cout << "Message received: " << message << std::endl;
+			std::cout << "client Message received: " << message << std::endl;
 			handleServerResponse(message);
 		}
 		else {
-			std::cerr << "Failed to receive message." << std::endl;
+			std::cerr << "client Failed to receive message." << std::endl;
 		}
 	}
 	else {
@@ -107,10 +107,18 @@ void Client::status() {
 	
 };
 void Client::initialize() {
-	
+	// Initialization code here
+	std::cout << "Client initialized." << std::endl;
+	// You can set up the socket and other resources here
+	socket.setBlocking(false); // Set the socket to non-blocking mode
+	// Add any other necessary initialization steps
 }; 
 void Client::cleanup() {
-	
+	// Cleanup code here
+	std::cout << "Client cleanup completed." << std::endl;
+	// Close the socket and free resources
+	socket.disconnect();
+	isConnected = false;
 };
 void Client::processMessage(const std::string& message) {
 	// Process the message received from the server
