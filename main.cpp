@@ -12,7 +12,7 @@ int main(int __argc, char* __argv[])
 
 
     // Give server a moment to start
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+
 
     // Initialize client
     Client client;
@@ -21,9 +21,10 @@ int main(int __argc, char* __argv[])
     client.connect(server.getIPAddress(), server.getPort());
     if (client.isConnected) {
         // Send a test message
+	   
         client.sendMessage("hello from client\n");
 		
-
+        std::this_thread::sleep_for(std::chrono::seconds(5));
 
 		server.sendMessage("Hello from server!\n");
 

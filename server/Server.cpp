@@ -54,6 +54,7 @@ void Server::acceptConnections() {
 			// No new client connected
 			delete clientSocket; // Clean up the socket if not accepted
 			std::this_thread::sleep_for(std::chrono::milliseconds(10)); // Sleep to avoid busy waiting
+			std::cout << "No new client connected.\n";
 		}
 		else {
 			std::cout << "accepting connections...\n";
@@ -79,7 +80,7 @@ void Server::handleClient(sf::TcpSocket* clientSocket) {
 			std::cout << "Message from client: " << message << std::endl;
 			processMessage(message);
 		}
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		
 	}
 
 	// Cleanup

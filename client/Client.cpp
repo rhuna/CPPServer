@@ -35,7 +35,7 @@ void Client::connect(const sf::IpAddress& ipAddress, unsigned short port) {
 	m_serverIpAddress = ipAddress;
 	m_serverPort = port;
 
-	sf::Clock timeout;
+	
 
 	sf::Socket::Status status = m_socket.connect(m_serverIpAddress, m_serverPort, sf::seconds(5));
 	if (status == sf::Socket::Status::Done) {
