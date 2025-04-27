@@ -20,6 +20,7 @@ void Logger::log(Level level, const std::string& message) {
     auto now = std::chrono::system_clock::now();
     auto now_time = std::chrono::system_clock::to_time_t(now);
 
+	//need to use localtime_s
     //log_file_ << std::put_time(std::localtime(&now_time), "%F %T")
     //    << " [" << levelStr << "] " << message << std::endl;
 }
