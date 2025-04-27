@@ -50,7 +50,12 @@ void Server::acceptConnections() {
 		sf::TcpSocket* clientSocket = new sf::TcpSocket;
 		clientSocket->setBlocking(false); // Set the client socket to non-blocking mode
 		
-		if (m_listener.accept(*clientSocket) == sf::Socket::Status::Done) {
+		if (m_listener.accept(*clientSocket) != sf::Socket::Status::Done) {
+			// No new client connected
+			delete clientSocket; // Clean up the socket if not accepted
+			std::this_thread::sleep_for(std::chrono::milliseconds(10)); // Sleep to avoid busy waiting
+		}
+		else {
 			std::cout << "accepting connections...\n";
 			std::lock_guard<std::mutex> lock(m_clientMutex); // Lock the mutex to protect shared resources
 			std::cout << "New client connected to Server IP: " << *clientSocket->getRemoteAddress() << "\n";
@@ -123,15 +128,17 @@ void Server::status() {
 };
 void Server::sendMessage(const std::string& message) {
 	// Send a message to the client
-	//std::lock_guard<std::mutex> lock(m_clientMutex); // Lock the mutex to protect shared resources
+	std::lock_guard<std::mutex> lock(m_clientMutex); // Lock the mutex to protect shared resources
+	m_packet << message;
+
 	for (auto it = m_clientSockets.begin(); it != m_clientSockets.end(); ) {
 		sf::TcpSocket* client = *it;
 		if (client->send(m_packet) != sf::Socket::Status::Done) {
 			std::cerr << "Failed to send message to client." << std::endl;
 			// Remove disconnected clients
 			client->disconnect();
-			delete client;
 			it = m_clientSockets.erase(it);
+			delete client;
 		}
 		else {
 			std::cout << "Message sent from server: " << message << std::endl;

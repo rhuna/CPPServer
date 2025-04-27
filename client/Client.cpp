@@ -9,7 +9,7 @@ Client::Client()
 {// Initialize the socket
 
 	std::cout << "client constructor called" << std::endl;
-	m_socket.setBlocking(false); // Set the socket to non-blocking mode
+	//m_socket.setBlocking(false); // Set the socket to non-blocking mode
 }
 Client::Client(sf::IpAddress servIPadd) 
 	: isConnected(false), m_serverPort(53000), m_serverIpAddress(servIPadd)
@@ -26,7 +26,7 @@ Client::~Client() {
 };
 void Client::connect(const sf::IpAddress& ipAddress, unsigned short port) {
 	// Connect to the server
-	std::this_thread::sleep_for(std::chrono::milliseconds(100)); // Simulate some delay for connection
+	std::this_thread::sleep_for(std::chrono::milliseconds(1000)); // Simulate some delay for connection
 	if (isConnected) {
 		std::cerr << "Already connected to server." << std::endl;
 		return;
@@ -34,6 +34,8 @@ void Client::connect(const sf::IpAddress& ipAddress, unsigned short port) {
 
 	m_serverIpAddress = ipAddress;
 	m_serverPort = port;
+
+	sf::Clock timeout;
 
 	sf::Socket::Status status = m_socket.connect(m_serverIpAddress, m_serverPort, sf::seconds(5));
 	if (status == sf::Socket::Status::Done) {

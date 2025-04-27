@@ -3,6 +3,7 @@
 #include <iostream>
 #include <SFML/Network.hpp>
 #include <thread>
+#include <mutex>
 
 class Client{
 public:	
