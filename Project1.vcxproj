@@ -173,10 +173,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="client\Client.h" />
+    <ClInclude Include="logger\logger.h" />
     <ClInclude Include="server\Server.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="client\Client.cpp" />
+    <ClCompile Include="logger\logger.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="server\Server.cpp" />
   </ItemGroup>
