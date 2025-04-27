@@ -15,10 +15,22 @@ public:
     static Logger& instance();
     void log(Level level, const std::string& message);
 
+    template<typename... Args>
+    void log(Level level, const std::string& format, Args... args) {
+        if (level < min_level) return;
+
+       // std::string message = fmt::format(format, args...);
+        // Actual logging implementation
+    }
+
+    void setLogFile(const std::string& filename);
+    void setMinLevel(Level level);
 
 private:
-    Logger() : log_file_("server.log", std::ios::app);
+
+    Logger();
     std::ofstream log_file_;
+    Level min_level = Level::Info;
     std::mutex mutex_;
 };
 
