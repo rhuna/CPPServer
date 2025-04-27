@@ -13,7 +13,6 @@ class Server{
 public:
 
 	std::thread acceptThread; 
-	std::mutex m_clientMutex;
 	Server();
 	~Server();	
 	void start();
@@ -39,6 +38,7 @@ public:
 private:
 
 
+	std::mutex m_clientMutex;
 	std::vector<sf::Packet> m_packets;
 	std::vector<sf::TcpSocket*> m_clientSockets;
 	sf::Packet m_packet;

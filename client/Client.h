@@ -2,6 +2,7 @@
 #define CLIENT_H
 #include <iostream>
 #include <SFML/Network.hpp>
+#include <thread>
 
 class Client{
 public:	

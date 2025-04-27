@@ -9,6 +9,7 @@ Client::Client()
 {// Initialize the socket
 
 	std::cout << "client constructor called" << std::endl;
+	m_socket.setBlocking(false); // Set the socket to non-blocking mode
 }
 Client::Client(sf::IpAddress servIPadd) 
 	: isConnected(false), m_serverPort(53000), m_serverIpAddress(servIPadd)
@@ -25,6 +26,7 @@ Client::~Client() {
 };
 void Client::connect(const sf::IpAddress& ipAddress, unsigned short port) {
 	// Connect to the server
+	std::this_thread::sleep_for(std::chrono::milliseconds(100)); // Simulate some delay for connection
 	if (isConnected) {
 		std::cerr << "Already connected to server." << std::endl;
 		return;
@@ -64,8 +66,9 @@ void Client::disconnect() {
 void Client::sendMessage(const std::string& message) {
 	// Send a message to the server
 	if (isConnected) {
-		m_packet << message;
-		if (m_socket.send(m_packet) != sf::Socket::Status::Done) {
+		sf::Packet packet;
+		packet << message;
+		if (m_socket.send(packet) != sf::Socket::Status::Done) {
 			std::cerr << "Client Failed to send message." << std::endl;
 		}
 		else {
@@ -80,9 +83,10 @@ void Client::sendMessage(const std::string& message) {
 void Client::receiveMessage() {
 	// Receive a message from the server
 	if (isConnected) {
-		if (m_socket.receive(m_packet) == sf::Socket::Status::Done) {
+		sf::Packet packet;
+		if (m_socket.receive(packet) == sf::Socket::Status::Done) {
 			std::string message;
-			m_packet >> message;
+			packet >> message;
 			
 			std::cout << "client Message received: " << message << std::endl;
 			handleServerResponse(message);

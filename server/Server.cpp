@@ -9,7 +9,7 @@ Server::Server()
 	m_clientIpAddress(sf::IpAddress::Any)
 {
 	
-
+	m_listener.setBlocking(false); // Set the listener to non-blocking mode
 
 };
 Server::~Server() {
@@ -48,6 +48,8 @@ void Server::start() {
 void Server::acceptConnections() {
 	while (m_isRunning) {
 		sf::TcpSocket* clientSocket = new sf::TcpSocket;
+		clientSocket->setBlocking(false); // Set the client socket to non-blocking mode
+		
 		if (m_listener.accept(*clientSocket) == sf::Socket::Status::Done) {
 			std::cout << "accepting connections...\n";
 			std::lock_guard<std::mutex> lock(m_clientMutex); // Lock the mutex to protect shared resources
@@ -141,9 +143,10 @@ void Server::sendMessage(const std::string& message) {
 void Server::receiveMessage() {
 	// Receive a message from the client
 	if (m_isRunning) {
-		if (m_clientSocket.receive(m_packet) == sf::Socket::Status::Done) {
+		sf::Packet packet;
+		if (m_clientSocket.receive(packet) == sf::Socket::Status::Done) {
 			std::string message;
-			m_packet >> message;
+			packet >> message;
 			std::cout << "Message received from Server: " << message << std::endl;
 			processMessage(message);
 		}
